@@ -4,20 +4,20 @@ import { Button } from "./ui/button";
 import React from "react";
 import PdfUpload from "./pdf-upload";
 import { toast } from "sonner";
+import useFileStore from "@/store/file";
 
 export default function PromptInput({
   onSubmit,
   message,
   setMessage,
   disabled,
-  selectedFileName,
 }: {
   onSubmit: (data: { message: string }) => void;
   message: string;
   setMessage: (message: string) => void;
   disabled: boolean;
-  selectedFileName?: string;
 }) {
+  const currentFile = useFileStore((state) => state.currentFile);
   const handleSubmit = () => {
     if (!message.trim() || disabled) return;
     onSubmit({ message });
@@ -26,7 +26,7 @@ export default function PromptInput({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && message.trim()) {
-      if (!selectedFileName) {
+      if (!currentFile) {
         toast.error("Please select a file or upload a new one");
         return;
       }
@@ -56,7 +56,7 @@ export default function PromptInput({
           onKeyDown={handleKeyDown}
         />
         <div className="flex items-center justify-end p-2 gap-2">
-          <PdfUpload selectedFileName={selectedFileName} />
+          <PdfUpload />
           <Button size={"icon"} type="submit" aria-label="Send message" disabled={!message.trim() || disabled}>
             <ArrowUp />
           </Button>

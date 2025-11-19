@@ -16,24 +16,15 @@ import {
 } from "@/components/ui/file-upload";
 import { Spinner } from "./ui/spinner";
 import { API_URL, cn } from "@/lib/utils";
-import { addFile, getFiles, setCurrentFileName } from "@/lib/storage";
+import useFileStore from "@/store/file";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 
-export default function PdfUpload({ selectedFileName }: { selectedFileName?: string }) {
+export default function PdfUpload() {
   const [files, setFiles] = React.useState<File[]>([]);
   const [uploading, setUploading] = React.useState(false);
-  const [allFiles, setAllFiles] = React.useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
-
-  const handleGetFiles = React.useCallback(() => {
-    const files = getFiles();
-    setAllFiles(files);
-  }, []);
-
-  React.useEffect(() => {
-    handleGetFiles();
-  }, [handleGetFiles]);
+  const { files: allFiles, currentFile, setFiles: setAllFiles, setCurrentFile: setCurrentFileName } = useFileStore();
 
   const onFileValidate = React.useCallback((file: File): string | null => {
     // Validate file type (only PDF)
@@ -82,9 +73,7 @@ export default function PdfUpload({ selectedFileName }: { selectedFileName?: str
       toast.success(data.message || "File uploaded successfully");
 
       // Save file to localStorage
-      addFile(data.fileName);
-      setCurrentFileName(data.fileName);
-      handleGetFiles();
+      setAllFiles([...allFiles, data.fileName]);
 
       setFiles([]);
     } finally {
@@ -110,7 +99,7 @@ export default function PdfUpload({ selectedFileName }: { selectedFileName?: str
               key={file}
               className={cn(
                 "flex items-center gap-2 border-t last:border-b p-2 hover:bg-accent/30 cursor-pointer",
-                selectedFileName === file && "bg-accent/30"
+                currentFile === file && "bg-accent/30"
               )}
               onClick={() => {
                 setCurrentFileName(file);

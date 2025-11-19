@@ -7,23 +7,23 @@ import * as React from "react";
 import Markdown from "./markdown";
 import { Skeleton } from "./ui/skeleton";
 import { API_URL } from "@/lib/utils";
-import { getCurrentFileName } from "@/lib/storage";
+import useFileStore from "@/store/file";
 import { toast } from "sonner";
 import { File } from "lucide-react";
 
 export default function Page() {
   const [message, setMessage] = React.useState<string>("");
-  const fileName = getCurrentFileName();
+  const currentFile = useFileStore((state) => state.currentFile);
   const { messages, sendMessage, status } = useChat({
     transport: new TextStreamChatTransport({
       api: `${API_URL}/chat`,
       body: {
-        fileName,
+        fileName: currentFile,
       },
     }),
   });
   const handleSubmit = (data: { message: string }) => {
-    if (!fileName) {
+    if (!currentFile) {
       toast.error("Please select a file or upload a new one");
       return;
     }
@@ -32,10 +32,10 @@ export default function Page() {
 
   return (
     <div className="h-screen relative">
-      {fileName && (
+      {currentFile && (
         <div className="flex items-center gap-2 p-2 border w-fit rounded-md fixed top-2 left-2 bg-secondary z-20">
           <File />
-          <p>{fileName?.split("_").slice(1).join(" ")}</p>
+          <p>{currentFile?.split("_").slice(1).join(" ")}</p>
         </div>
       )}
       <div className="space-y-10 lg:w-4xl w-xl mx-auto px-3 pt-8 pb-44">
@@ -64,13 +64,7 @@ export default function Page() {
           </div>
         )}
       </div>
-      <PromptInput
-        onSubmit={handleSubmit}
-        message={message}
-        setMessage={setMessage}
-        disabled={false}
-        selectedFileName={fileName ?? undefined}
-      />
+      <PromptInput onSubmit={handleSubmit} message={message} setMessage={setMessage} disabled={false} />
     </div>
   );
 }
