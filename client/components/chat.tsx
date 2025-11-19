@@ -17,9 +17,6 @@ export default function Page() {
   const { messages, sendMessage, status } = useChat({
     transport: new TextStreamChatTransport({
       api: `${API_URL}/chat`,
-      body: {
-        fileName: currentFile,
-      },
     }),
   });
   const handleSubmit = (data: { message: string }) => {
@@ -27,7 +24,14 @@ export default function Page() {
       toast.error("Please select a file or upload a new one");
       return;
     }
-    sendMessage({ text: data.message });
+    sendMessage(
+      { text: data.message },
+      {
+        body: {
+          fileName: currentFile,
+        },
+      }
+    );
   };
 
   return (
