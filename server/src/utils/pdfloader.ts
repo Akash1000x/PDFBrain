@@ -1,7 +1,8 @@
-import { PDFParse, type PageTextResult } from 'pdf-parse'
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
+import type { Document } from "@langchain/core/documents";
 
-export async function getPdfContent(filePath: string): Promise<PageTextResult[]> {
-  const data = new PDFParse({ url: filePath });
-  const text = await data.getText();
-  return text.pages;
+export async function getPdfContent(filePath: string): Promise<Document[]> {
+  const loader = new PDFLoader(filePath);
+  const docs = await loader.load();
+  return docs;
 }
