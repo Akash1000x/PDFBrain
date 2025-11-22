@@ -11,22 +11,6 @@ async function textSplitter(content: Document[]) {
     chunkOverlap: 100,
   })
 
-  // const chunksWithPageNumbers: Array<{ chunk: string; pageNumber: number }> = [];
-
-  // for (let i = 0; i < content.length; i++) {
-  //   const page = content[i];
-  //   if (!page) continue;
-  //   const pageNumber = i + 1; // Page numbers are 1-indexed
-  //   const pageChunks = await textSplitter.splitText(page.text);
-
-  //   for (const chunk of pageChunks) {
-  //     chunksWithPageNumbers.push({
-  //       chunk,
-  //       pageNumber,
-  //     });
-  //   }
-  // }
-
   const chunks = await textSplitter.splitDocuments(content);
 
   return chunks;
