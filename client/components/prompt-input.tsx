@@ -1,4 +1,4 @@
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, RotateCcw } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import React from "react";
@@ -11,11 +11,17 @@ export default function PromptInput({
   message,
   setMessage,
   disabled,
+  ragType,
+  setRagType,
+  resetChat,
 }: {
   onSubmit: (data: { message: string }) => void;
   message: string;
   setMessage: (message: string) => void;
   disabled: boolean;
+  ragType: "simple" | "multi";
+  setRagType: (ragType: "simple" | "multi") => void;
+  resetChat: () => void;
 }) {
   const currentFile = useFileStore((state) => state.currentFile);
   const handleSubmit = () => {
@@ -55,11 +61,27 @@ export default function PromptInput({
           }}
           onKeyDown={handleKeyDown}
         />
-        <div className="flex items-center justify-end p-2 gap-2">
-          <PdfUpload />
-          <Button size={"icon"} type="submit" aria-label="Send message" disabled={!message.trim() || disabled}>
-            <ArrowUp />
+        <div className="flex items-center justify-between p-2 gap-2">
+          <Button size="sm" variant="destructive" onClick={() => resetChat()}>
+            <RotateCcw />
+            Reset Chat
           </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={ragType === "simple" ? "default" : "outline"}
+              onClick={() => setRagType("simple")}
+            >
+              Simple RAG
+            </Button>
+            <Button size="sm" variant={ragType === "multi" ? "default" : "outline"} onClick={() => setRagType("multi")}>
+              Multi Query RAG
+            </Button>
+            <PdfUpload />
+            <Button size={"icon"} type="submit" aria-label="Send message" disabled={!message.trim() || disabled}>
+              <ArrowUp />
+            </Button>
+          </div>
         </div>
       </form>
     </div>

@@ -14,10 +14,17 @@ import { File } from "lucide-react";
 export default function Page() {
   const [message, setMessage] = React.useState<string>("");
   const currentFile = useFileStore((state) => state.currentFile);
-  const { messages, sendMessage, status } = useChat({
+  const [ragType, setRagType] = React.useState<"simple" | "multi">("simple");
+
+  const apiUrl = React.useMemo(() => {
+    return ragType === "simple" ? `${API_URL}/simple-rag-chat` : `${API_URL}/multi-query-rag-chat`;
+  }, [ragType]);
+
+  const { messages, sendMessage, status, setMessages } = useChat({
     transport: new TextStreamChatTransport({
-      api: `${API_URL}/chat`,
+      api: apiUrl,
     }),
+    id: ragType,
   });
   const handleSubmit = (data: { message: string }) => {
     if (!currentFile) {
@@ -42,7 +49,7 @@ export default function Page() {
           <p>{currentFile?.split("_").slice(1).join(" ")}</p>
         </div>
       )}
-      <div className="space-y-10 lg:w-4xl w-xl mx-auto px-3 pt-8 pb-44">
+      <div className="space-y-10 lg:w-3xl w-xl mx-auto px-3 pt-8 pb-44">
         {messages?.map((message, i) => (
           <div key={`${message.id + i}`} className="">
             {message.role === "user" ? (
@@ -53,8 +60,12 @@ export default function Page() {
               </div>
             ) : (
               message.parts.map((part, index) => (
-                <div key={`${message.id}-${index}`} className="">
-                  {part.type === "text" ? <MemoizedReactMarkdown>{part.text}</MemoizedReactMarkdown> : null}
+                <div key={`${message.id}-${index}`}>
+                  {part.type === "text" && (
+                    <div className="border rounded-md p-2 bg-accent/30 mr-2">
+                      <MemoizedReactMarkdown>{part.text}</MemoizedReactMarkdown>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -68,7 +79,17 @@ export default function Page() {
           </div>
         )}
       </div>
-      <PromptInput onSubmit={handleSubmit} message={message} setMessage={setMessage} disabled={false} />
+      <PromptInput
+        onSubmit={handleSubmit}
+        message={message}
+        setMessage={setMessage}
+        disabled={false}
+        ragType={ragType}
+        setRagType={setRagType}
+        resetChat={() => {
+          setMessages([]);
+        }}
+      />
     </div>
   );
 }
