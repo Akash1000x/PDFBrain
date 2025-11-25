@@ -17,7 +17,7 @@ export default function Page() {
   const [ragType, setRagType] = React.useState<"simple" | "multi">("simple");
 
   const apiUrl = React.useMemo(() => {
-    return ragType === "simple" ? `${API_URL}/simple-rag-chat` : `${API_URL}/multi-query-rag-chat`;
+    return ragType === "simple" ? `${API_URL}/query-rewriting-rag-chat` : `${API_URL}/multi-query-rag-chat`;
   }, [ragType]);
 
   const { messages, sendMessage, status, setMessages } = useChat({
