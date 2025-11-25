@@ -14,10 +14,14 @@ import { File } from "lucide-react";
 export default function Page() {
   const [message, setMessage] = React.useState<string>("");
   const currentFile = useFileStore((state) => state.currentFile);
-  const [ragType, setRagType] = React.useState<"simple" | "multi">("simple");
+  const [ragType, setRagType] = React.useState<"simple" | "multi" | "decomposition">("simple");
 
   const apiUrl = React.useMemo(() => {
-    return ragType === "simple" ? `${API_URL}/query-rewriting-rag-chat` : `${API_URL}/multi-query-rag-chat`;
+    return ragType === "simple"
+      ? `${API_URL}/query-rewriting-rag-chat`
+      : ragType === "multi"
+      ? `${API_URL}/multi-query-rag-chat`
+      : `${API_URL}/query-decomposition-rag-chat`;
   }, [ragType]);
 
   const { messages, sendMessage, status, setMessages } = useChat({
@@ -62,7 +66,7 @@ export default function Page() {
               message.parts.map((part, index) => (
                 <div key={`${message.id}-${index}`}>
                   {part.type === "text" && (
-                    <div className="border rounded-md p-2 bg-accent/30 mr-2">
+                    <div className="border rounded-md px-4 bg-accent/30 mr-2">
                       <MemoizedReactMarkdown>{part.text}</MemoizedReactMarkdown>
                     </div>
                   )}

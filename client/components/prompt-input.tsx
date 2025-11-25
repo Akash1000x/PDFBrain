@@ -19,8 +19,8 @@ export default function PromptInput({
   message: string;
   setMessage: (message: string) => void;
   disabled: boolean;
-  ragType: "simple" | "multi";
-  setRagType: (ragType: "simple" | "multi") => void;
+  ragType: "simple" | "multi" | "decomposition";
+  setRagType: (ragType: "simple" | "multi" | "decomposition") => void;
   resetChat: () => void;
 }) {
   const currentFile = useFileStore((state) => state.currentFile);
@@ -76,6 +76,13 @@ export default function PromptInput({
             </Button>
             <Button size="sm" variant={ragType === "multi" ? "default" : "outline"} onClick={() => setRagType("multi")}>
               Multi Query RAG
+            </Button>
+            <Button
+              size="sm"
+              variant={ragType === "decomposition" ? "default" : "outline"}
+              onClick={() => setRagType("decomposition")}
+            >
+              Query Decomposition
             </Button>
             <PdfUpload />
             <Button size={"icon"} type="submit" aria-label="Send message" disabled={!message.trim() || disabled}>
