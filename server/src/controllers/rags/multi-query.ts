@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { convertToModelMessages, generateObject, generateText, streamText } from "ai"
+import { convertToModelMessages, generateObject, streamText } from "ai"
 import { google } from "@ai-sdk/google"
 import { getVectorStore } from "../../utils/vectorstore.js";
 import { z } from 'zod'
@@ -42,7 +42,7 @@ function reciprocalRankFusion(ranks: Document[][], k = 60) {
   return Array.from(scores.entries())
     .map(([id, { score, content }]) => ({ id, score, content }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
+    .slice(0, 6);
 }
 
 
@@ -63,7 +63,6 @@ export async function multiQueryRagChatController(req: Request, res: Response) {
     const docs = await getPdfContent(`${getRootDirname()}/uploads/${fileName}`);
 
     const queries = await queryTranslation(prompt, docs[0]?.pageContent || "");
-    console.log(queries);
     const vectorStore = await getVectorStore(fileName);
     const results: Document[][] = [];
 
@@ -74,12 +73,12 @@ export async function multiQueryRagChatController(req: Request, res: Response) {
 
     const fusedRanks = reciprocalRankFusion(results);
 
-    const result = streamText({
+    const responseStream = streamText({
       model: google("gemini-2.5-flash"),
       system: getSystemPrompt(fusedRanks.map(({ content }) => content).join("\n\n"), docs[0]?.pageContent || ""),
       messages: convertToModelMessages(messages),
     })
-    result.pipeTextStreamToResponse(res);
+    responseStream.pipeTextStreamToResponse(res);
   } catch (error) {
     console.error("Error in multiQueryRagChatController", error);
     return res.status(500).json({ message: "Internal server error" });
