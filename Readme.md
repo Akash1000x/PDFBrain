@@ -2,6 +2,10 @@
 
 A powerful Retrieval-Augmented Generation (RAG) system for querying PDF documents using multiple advanced RAG approaches. PDFBrain enables intelligent document Q&A by combining vector search with large language models, powered by Vercel AI SDK.
 
+
+https://github.com/user-attachments/assets/daf86271-07a7-4b7a-bd5a-3ebf30d4ff6d
+
+
 ## 🚀 Features
 
 - **PDF Document Upload**: Upload and process PDF files for intelligent querying
